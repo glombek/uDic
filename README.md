@@ -2,6 +2,8 @@
 
 Mess with Umbraco translation dictionaries by manipulating uSync files.
 
+[![NuGet Version](https://img.shields.io/nuget/v/udic)](https://www.nuget.org/packages/udic)
+
 uDic assumes (and enforces) a hierarchical dictionary setup delimited by dots (`.`)
 
 For example:
