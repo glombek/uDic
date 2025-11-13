@@ -27,7 +27,17 @@ For example:
 
 This is a dotnet tool.
 
-You will be able to install it via nuget when I set it up, for now run in development mode.
+You can either install it globally like so:
+
+`dotnet tool install -g udic`
+
+Or locally to your Umbraco project:
+
+`dotnet tool install udic`
+
+You can also execute it without installing by using:
+
+`dnx udic <commands>`
 
 ### Local development
 
