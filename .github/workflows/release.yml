@@ -19,8 +19,8 @@ jobs:
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: 9.0.x
+      #with:
+      #  dotnet-version: 9.0.x
 
     - name: Build & Pack
       run: dotnet pack .\udic.csproj -c Release /p:Version=${{github.ref_name}}
