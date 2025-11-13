@@ -69,9 +69,9 @@ Run `udic --help` or `udic <command> --help` for in-app guidance.
   Moves (or renames) dictionary items/a whole tree.
   e.g. `udic move Login* MembersArea.Login` will move `Login`, `Login.Username` and `Login.Password` to `MembersArea.Login`, `MembersArea.Login.Username` and `MembersArea.Login.Password`
   
-- `shim`
+- `seed`
   Populates the specified culture with dummy data based on a format string to test internationalization logic without real translation data.
-  e.g `udic shim "[{culture}] {value:en-GB} ({alias})" -n * -c da` would populate all (`*` matches all) values in the `da` culture with a calculated value such as `[da] Username (Login.Username)`
+  e.g `udic seed "[{culture}] {value:en-GB} ({alias})" -n * -c da` would populate all (`*` matches all) values in the `da` culture with a calculated value such as `[da] Username (Login.Username)`
 
 Yet to implement:
 

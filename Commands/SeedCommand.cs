@@ -7,12 +7,12 @@ using System.Xml.Linq;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
-public class ShimCommand : Command<ShimSettings>
+public class SeedCommand : Command<SeedSettings>
 {
     private static readonly Regex FormatParser = new(@"{(?<name>[^:}]+)(?::(?<param>[^:}]+))*}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    public override int Execute(CommandContext context, ShimSettings settings, CancellationToken cancellationToken)
+    public override int Execute(CommandContext context, SeedSettings settings, CancellationToken cancellationToken)
     {
-        AnsiConsole.WriteLine($"Shimming {settings.Culture} for '{settings.Name}' in format '{settings.Format}'");
+        AnsiConsole.WriteLine($"Seeding {settings.Culture} for '{settings.Name}' in format '{settings.Format}'");
 
         var dictDir = DictionaryHelper.GetDictionaryDirectory(settings.ProjectPath, createIfMissing: false);
 
@@ -75,7 +75,7 @@ public class ShimCommand : Command<ShimSettings>
 
                 aliasMapping.Value.Doc.Save(aliasMapping.Value.Path);
 
-                AnsiConsole.MarkupLine($"[green]Shimmed dictionary item '{aliasMapping.Key.EscapeMarkup()}' = '{value.EscapeMarkup()}' at:[/] [blue]{aliasMapping.Value.Path.EscapeMarkup()}[/]");
+                AnsiConsole.MarkupLine($"[green]Seeded dictionary item '{aliasMapping.Key.EscapeMarkup()}' = '{value.EscapeMarkup()}' at:[/] [blue]{aliasMapping.Value.Path.EscapeMarkup()}[/]");
             }
         }
 

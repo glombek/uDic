@@ -1,6 +1,6 @@
 ﻿using Spectre.Console.Cli;
 
-public class ShimSettings : BaseSettings
+public class SeedSettings : BaseSettings
 {
 
     [CommandArgument(0, "<format>")]

@@ -8,11 +8,18 @@
 		<PackAsTool>true</PackAsTool>
 		<ToolCommandName>udic</ToolCommandName>
 		<PackageOutputPath>./nupkg</PackageOutputPath>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Spectre.Console" Version="0.54.0" />
 		<PackageReference Include="Spectre.Console.Cli" Version="0.53.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="nupkg\" />
+		<None Include="README.md" Pack="true" PackagePath="\"/>
 	</ItemGroup>
 
 </Project>

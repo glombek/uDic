@@ -1,5 +1,4 @@
 ﻿using Spectre.Console.Cli;
-using System.ComponentModel;
 
 var app = new CommandApp();
 
@@ -25,9 +24,9 @@ app.Configure(config =>
         //.WithDescription("Adds dictionary items from the specified file.");
     });
 
-    config.AddCommand<ShimCommand>("shim")
+    config.AddCommand<SeedCommand>("seed")
         .WithDescription("Sets the value of the specified culture for specified name(s) to the given format.")
-        .WithExample("shim \"[{culture}] {value:en-GB} ({alias})\" -n * -c da");
+        .WithExample("seed \"[{culture}] {value:en-GB} ({alias})\" -n * -c da");
 });
 
 return app.Run(args);
