@@ -20,6 +20,10 @@ app.Configure(config =>
         add.AddCommand<AddItemCommand>("item")
             .WithDescription("Adds a new dictionary item with the specified name.")
             .WithExample("add item New.Alias \"Value goes here\" -c en-GB");
+        add.AddCommand<AddScanCommand>("scan")
+            .WithDescription("Scans razor (cshtml) files for dictionary items and adds them as dictionary items.")
+            .WithExample("add scan -p C:\\Path\\To\\Project -c en-GB")
+            .WithExample("add scan -path C:\\Path\\To\\Views\\To\\Scan.cshtml -c en-GB");
         //add.AddCommand<AddFileCommand>("file")
         //.WithDescription("Adds dictionary items from the specified file.");
     });

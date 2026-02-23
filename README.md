@@ -72,6 +72,14 @@ Run `udic --help` or `udic <command> --help` for in-app guidance.
   Options:
 
   - `-c`|`--culture` - The culture to add, defaults to your current language
+  
+- `add scan`
+
+  Scans Razor (cshtml) files for dictionary keys and adds any missing ones to the dictionary, passing an optional filepath to search and culture to populate.
+  e.g. `udic add scan -c en-GB` to scan all files in the project
+  Options:
+
+  - `-f`|`--path` - The directory or file to search for keys, defaults to the whole project
 
 - `copy`
   Copies dictionary items/a whole tree into a new location. Pass the `--empty` flag to clear existing translations when copying
