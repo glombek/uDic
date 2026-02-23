@@ -161,5 +161,73 @@ public static class DictionaryHelper
         return isGlob;
     }
 
+    // Adds or updates a dictionary item with the specified culture/value.
+    // Ensures parent chain exists. Returns the file path and whether it was created (true) or updated (false).
+    public static (string? Path, bool Created) AddOrUpdateDictionaryItem(
+        string dictDir,
+        Dictionary<string, (string Path, XDocument Doc)> aliasMap,
+        string alias,
+        string culture,
+        string? value,
+        CancellationToken cancellationToken,
+        Action<string>? log = null,
+        bool overwriteEmpty = true)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        // Ensure parents exist
+        var parent = GetParent(alias);
+        if (!string.IsNullOrEmpty(parent))
+        {
+            EnsureParents(alias, dictDir, aliasMap, cancellationToken, log);
+        }
+
+        // If exists update
+        if (aliasMap.TryGetValue(alias, out var kv))
+        {
+            var root = kv.Doc.Root!;
+            var translations = root.Element("Translations");
+            if (translations == null)
+            {
+                translations = new XElement("Translations");
+                root.Add(translations);
+            }
+
+            var translation = translations.Elements("Translation")
+                .FirstOrDefault(t => string.Equals(t.Attribute("Language")?.Value, culture, StringComparison.OrdinalIgnoreCase));
+
+            if (translation == null)
+            {
+                translation = new XElement("Translation", new XAttribute("Language", culture), new XElement("Value", value ?? string.Empty));
+                translations.Add(translation);
+            }
+            else
+            {
+                if (overwriteEmpty)
+                {
+                    translation.Value = value ?? string.Empty;
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        translation.Value = value;
+                    }
+                }
+            }
+
+            kv.Doc.Save(kv.Path);
+            return (kv.Path, false);
+        }
+
+        // Create new item
+        var createdPath = CreateDictionaryItem(dictDir, aliasMap, alias, value is null ? null : (culture, value));
+        if (createdPath != null)
+        {
+            return (createdPath, true);
+        }
+
+        return (null, false);
+    }
 
 }

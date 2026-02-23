@@ -64,8 +64,8 @@ public class AddScanCommand : Command<AddScanSettings>
             return 1;
         }
 
-        // Regex to match @Umbraco.GetDictionaryValue("key", "value")  or single-arg form
-        var pattern = new Regex(@"@Umbraco\.GetDictionaryValue\(\s*""(?<key>[^""]+)""\s*(?:,\s*""(?<value>[^""]*)"")?\s*\)", RegexOptions.Compiled);
+        // Regex to match @Umbraco.GetDictionaryValue("key", "value") or @Umbraco.GetDictionaryValue('key','value') or single-arg form
+        var pattern = new Regex(@"@Umbraco\.GetDictionaryValue\(\s*[\"'](?<key>[^\"']+)[\"']\s*(?:,\s*[\"'](?<value>[^\"']*)[\"'])?\s*\)", RegexOptions.Compiled);
 
         foreach (var file in filesToScan)
         {
@@ -113,55 +113,21 @@ public class AddScanCommand : Command<AddScanSettings>
             cancellationToken.ThrowIfCancellationRequested();
             AnsiConsole.WriteLine($"Adding '{match.Key}' = '{match.Value}'");
 
-            // Ensure parents exist for the new alias
-            var newParent = DictionaryHelper.GetParent(match.Key);
-            if (!string.IsNullOrEmpty(newParent))
+            var (path, created) = DictionaryHelper.AddOrUpdateDictionaryItem(dictDir, aliasMap, match.Key, settings.Culture, match.Value, cancellationToken, s => AnsiConsole.MarkupLine($"[green]{s}[/]"), overwriteEmpty: false);
+
+            if (path is null)
             {
-                DictionaryHelper.EnsureParents(match.Key, dictDir, aliasMap, cancellationToken, s => AnsiConsole.MarkupLine($"[green]{s}[/]"));
+                AnsiConsole.MarkupLine("[red]Failed to create dictionary item.[/]");
+                return 1;
             }
 
-            if (aliasMap.TryGetValue(match.Key, out var kv))
+            if (created)
             {
-                // Already exists, add this culture
-                var root = kv.Doc.Root!;
-
-                var translations = root.Element("Translations");
-                if (translations != null)
-                {
-                    // Get translation for specified culture
-
-                    var translation = translations.Elements("Translation")
-                        .FirstOrDefault(t => t.Attribute("Language")?.Value == settings.Culture);
-
-                    if (translation == null)
-                    {
-                        // Add new translation
-                        translation = new XElement("Translation",
-                            new XAttribute("Language", settings.Culture),
-                            new XElement("Value", match.Value ?? string.Empty));
-                        translations.Add(translation);
-                    }
-
-                    if (!string.IsNullOrEmpty(match.Value))
-                    {
-                        translation.Value = match.Value ?? string.Empty;
-                    }
-                }
-
-                kv.Doc.Save(kv.Path);
+                AnsiConsole.MarkupLine($"[green]Created dictionary item at:[/] [blue]{path}[/]");
             }
             else
             {
-
-                var filePath = DictionaryHelper.CreateDictionaryItem(dictDir, aliasMap, match.Key, match.Value is null ? null : (settings.Culture, match.Value));
-
-                if (filePath is null)
-                {
-                    AnsiConsole.MarkupLine("[red]Failed to create dictionary item.[/]");
-                    return 1;
-                }
-
-                AnsiConsole.MarkupLine($"[green]Created dictionary item at:[/] [blue]{filePath}[/]");
+                AnsiConsole.MarkupLine($"[green]Updated dictionary item at:[/] [blue]{path}[/]");
             }
         }
 

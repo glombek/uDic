@@ -12,52 +12,21 @@ public class AddItemCommand : Command<AddItemSettings>
 
         var aliasMap = DictionaryHelper.LoadAliasMap(dictDir, cancellationToken);
 
-        // Ensure parents exist for the new alias
-        var newParent = DictionaryHelper.GetParent(settings.Alias);
-        if (!string.IsNullOrEmpty(newParent))
+        var (path, created) = DictionaryHelper.AddOrUpdateDictionaryItem(dictDir, aliasMap, settings.Alias, settings.Culture, settings.Value, cancellationToken, s => AnsiConsole.MarkupLine($"[green]{s}[/]"), overwriteEmpty: true);
+
+        if (path is null)
         {
-            DictionaryHelper.EnsureParents(settings.Alias, dictDir, aliasMap, cancellationToken, s => AnsiConsole.MarkupLine($"[green]{s}[/]"));
+            AnsiConsole.MarkupLine("[red]Failed to create or update dictionary item.[/]");
+            return 1;
         }
 
-        if (aliasMap.TryGetValue(settings.Alias, out var kv))
+        if (created)
         {
-            // Already exists, add this culture
-            var root = kv.Doc.Root!;
-
-            var translations = root.Element("Translations");
-            if (translations != null)
-            {
-                // Get translation for specified culture
-
-                var translation = translations.Elements("Translation")
-                    .FirstOrDefault(t => t.Attribute("Language")?.Value == settings.Culture);
-
-                if (translation == null)
-                {
-                    // Add new translation
-                    translation = new XElement("Translation",
-                        new XAttribute("Language", settings.Culture),
-                        new XElement("Value", settings.Value ?? string.Empty));
-                    translations.Add(translation);
-                }
-
-                translation.Value = settings.Value ?? string.Empty;
-            }
-
-            kv.Doc.Save(kv.Path);
+            AnsiConsole.MarkupLine($"[green]Created dictionary item at:[/] [blue]{path}[/]");
         }
         else
         {
-
-            var filePath = DictionaryHelper.CreateDictionaryItem(dictDir, aliasMap, settings.Alias, settings.Value is null ? null : (settings.Culture, settings.Value));
-
-            if (filePath is null)
-            {
-                AnsiConsole.MarkupLine("[red]Failed to create dictionary item.[/]");
-                return 1;
-            }
-
-            AnsiConsole.MarkupLine($"[green]Created dictionary item at:[/] [blue]{filePath}[/]");
+            AnsiConsole.MarkupLine($"[green]Updated dictionary item at:[/] [blue]{path}[/]");
         }
 
         AnsiConsole.MarkupLine("[blue]Add operation complete.[/]");
